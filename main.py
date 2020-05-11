@@ -1,4 +1,5 @@
 import sqlite3
+import datetime
 
 #  CREATE TABLE STUDENTS(
 #    ...> ID INT PRIMARY KEY,
@@ -97,6 +98,26 @@ def view_full_record():
     except Exception as e:
         print(e)
 
+def mark_attendance():
+    degree = input('Enter degree: ')
+    semester = int(input('Enter semester: '))
+    subject = input('Enter subject name: ')
+
+    try:
+        print('\nEnter 0 for absent, 1 for present')
+        attendance = []
+        for row in cur.execute('SELECT * FROM STUDENTS WHERE DEGREE = ? AND SEMESTER = ?', (degree, semester)):
+            presence = int(input(f'{row[0]}: '))
+            attendance.append((row[0], str(datetime.date.today()), degree, presence))
+
+        cur.executemany(f'INSERT INTO {subject} VALUES (?, ?, ?, ?)', attendance)
+        conn.commit()
+
+    except Exception as e:
+        print(e)
+    else:
+        print('\nAttendance Marked')
+
 def menu():
     print('\n===================')
     print('1. Add a student')
@@ -104,9 +125,10 @@ def menu():
     print('3. View all students')
     print('4. Add a subject')
     print('5. Remove a subject')
-    print('6. View all subject')
-    print('7. View full record of a subject')
-    print('8. Exit')
+    print('6. View all subjects')
+    print('7. Mark attendance')
+    print('8. View full record of a subject')
+    print('9. Exit')
     print('===================\n')
     option = int(input("Enter choice: "))
 
@@ -135,10 +157,14 @@ def menu():
         return True
 
     elif option == 7:
-        view_full_record()
+        mark_attendance()
         return True
 
     elif option == 8:
+        view_full_record()
+        return True
+
+    elif option == 9:
         return False
 
     else:
