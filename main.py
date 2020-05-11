@@ -122,7 +122,6 @@ def monthly_report():
                 presents[row[0]] = 0
 
         distinct_days = set(total_days)
-        print(f'Total days: {len(distinct_days)}')
         for record in records:
             if record[3] == 1:
                 presents[record[0]] += 1
@@ -130,6 +129,39 @@ def monthly_report():
         for student, attendance in presents.items():
             percentage = (attendance * 100) / len(distinct_days)
             print(f'{student}: {percentage}%')
+
+        print(f'Total days: {len(distinct_days)}')
+
+    except Exception as e:
+        print(e)
+
+def yearly_report():
+    degree = input('Enter degree: ')
+    subject = input('Enter subject name: ')
+    year = int(input('Enter year: '))
+
+    records = []
+    total_days = []
+    presents = {}
+
+    try:
+        for row in cur.execute(f'SELECT * FROM {subject} WHERE DEGREE = ? ORDER BY ID ASC', (degree, )):
+            date = datetime.datetime.strptime(row[1], '%Y-%m-%d').date()
+            if date.year == year:
+                records.append(row)
+                total_days.append(date.day)
+                presents[row[0]] = 0
+
+        distinct_days = set(total_days)
+        for record in records:
+            if record[3] == 1:
+                presents[record[0]] += 1
+
+        for student, attendance in presents.items():
+            percentage = (attendance * 100) / len(distinct_days)
+            print(f'{student}: {percentage}%')
+
+        print(f'Total days: {len(distinct_days)}')
 
     except Exception as e:
         print(e)
@@ -143,8 +175,8 @@ def menu():
     print('5. Remove a subject')
     print('6. View all subjects')
     print('7. Mark attendance')
-    print('8. View full record of a subject')
-    print('9. View monthly report')
+    print('8. View monthly report')
+    print('9. View yearly report')
     print('10. Exit')
     print('\n===============================')
     option = int(input("Enter choice: "))
@@ -178,11 +210,11 @@ def menu():
         return True
 
     elif option == 8:
-        view_full_record()
+        monthly_report()
         return True
 
     elif option == 9:
-        monthly_report()
+        yearly_report()
         return True
 
     elif option == 10:
